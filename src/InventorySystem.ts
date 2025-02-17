@@ -16,25 +16,42 @@ interface Product {
 }
 
 class InventoryManager<T extends Product> {
-  products = []
+  private products: T[] = [];
 
-  addProduct(product) {
+  addProduct(product: T): string {
+    this.products.push(product);
+    return `Product ${product.name} successfully added`
+  }
+
+  updateProduct(id: number, update: Partial<T>): string {
+    const product = this.products.find((p) => p.id === id);
+    if (product) {
+      Object.assign(product, update);
+      return `Product ${id} successfully updated`;
+    } else {
+      return `Product with ID ${id} not found it`
+    }
 
   }
 
-  updateProduct(id, update) {
+  getProduct(id: number): T | string {
+    const product = this.products.find((p) => p.id === id);
+    return product ? product : `Product not found it`;
 
   }
 
-  getProduct(id) {
-
+  getAllProducts(): T[] {
+    return this.products;
   }
 
-  getAllProducts() {
-
-  }
-
-  removeProduct(id) {
+  removeProduct(id: number): string {
+    const index = this.products.findIndex((p) => p.id === id);
+    if (index !== -1) {
+      this.products.splice(index, 1);
+      return `Product ${id} successfully removed`
+    } else {
+      return `Product with ID ${id} not found it`;
+    }
 
   }
 }

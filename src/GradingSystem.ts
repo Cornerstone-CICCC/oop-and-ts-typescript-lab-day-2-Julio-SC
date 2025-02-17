@@ -20,26 +20,60 @@ interface Student {
 }
 
 class Gradebook<T extends Student> {
-  students = []
+  private students: T[] = [];
 
-  addStudent(student) {
+  addStudent(student: T): string {
+    this.students.push(student);
+    return `${student.name} added to the grade book`;
+  }
+
+  addGrade(id: number, grade: Grade): string {
+    const student = this.students.find((s) => s.id === id);
+
+    if (student) {
+      student.grades.push(grade);
+      return `subject registered for ${grade.subject}`;
+    } else {
+      return `Student with ID ${id} not found it.`
+    }
 
   }
 
-  addGrade(id, grade) {
+  getAverageGrade(id: number): number | string {
+    const student = this.students.find((s) => s.id === id);
+    if (student) {
+      const totalGrades = student.grades.reduce ((sum,grade) => sum + grade.grade,0);
+      const numberOfSubjects = student.grades.length;
+      return numberOfSubjects > 0 ? totalGrades / numberOfSubjects : 0;
+    } else{
+      return `Student with ID ${id} not found it`
+    }
 
   }
 
-  getAverageGrade(id) {
+  getStudentGrades(id: number): Grade[] | string {
+    const student =this.students.find((s) => s.id === id);
 
+    if (student) {
+      return student.grades;
+    } else {
+      return `Student with ID ${id} not found it.`;
+    }
   }
 
-  getStudentGrades(id) {
-
-  }
-
-  updateSubjectGrade(id, subject, newGrade) {
-
+  updateSubjectGrade(id: number, subject: string, newGrade: number): string {
+    const student = this.students.find((s) => s.id === id);
+    if (student) {
+      const grade = student.grades.find((g) => g.subject === subject);
+      if (grade) {
+        grade.grade = newGrade;
+        return `Grade of ${subject} updated to ${newGrade}.`;
+      } else {
+        return `Subject ${subject} not found it for the student with the id ${id}.`;
+      }
+    } else {
+      return `Student with ID ${id} not found it.`;
+    }
   }
 }
 

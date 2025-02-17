@@ -25,35 +25,58 @@ interface CartItem {
 }
 
 class ShoppingCart<T extends CartItem> {
-  cart = []
+  private cart: T[] = [];
 
-  addToCart(product) {
-
-  }
-
-  updateQuantity(id, qty) {
-
-  }
-
-  getTotalPrice() {
-
-  }
-
-  getProductsOfCategory(category) {
+  addToCart(product: T): string {
+   const existingProduct = this.cart.find((item) => item.id === product.id);
+   if (existingProduct){
+    existingProduct.quantity += product.quantity;
+    return `${existingProduct.name} quantity updated to ${existingProduct.quantity}.`;
+   } else {
+    this.cart.push(product);
+    return `${product.name} added to cart.`;
+   }
 
   }
 
-  removeFromCart(id) {
+  updateQuantity(id: number, qty: number): string {
+    const product = this.cart.find((item) => item.id === id);
+    if (product) {
+      if (qty <= 0) {
+        return this.removeFromCart(id);
+      }
+      product.quantity = qty;
+      return `Updated quantity of ${product.name} to ${product.quantity}.`;
+    } else {
+      return `Product with ID ${id} not found in cart.`;
+    }
+  }
 
+  getTotalPrice(): number {
+    return this.cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  }
+
+  getProductsOfCategory(category: Category): T[] {
+    return this.cart.filter((item) => item.category === category);
+  }
+
+
+  removeFromCart(id: number): string {
+    const index = this.cart.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      const removedProduct = this.cart.splice(index, 1)[0];
+      return `${removedProduct.name} removed from cart.`;
+    } else {
+      return `Product with ID ${id} not found in cart.`;
+    }
   }
 }
-
 // Test cases
 const cart = new ShoppingCart();
 
 console.log(cart.addToCart({ id: 1, name: "Headphones", price: 50, quantity: 1, category: Category.Electronics })); // "Headphones added to cart."
 console.log(cart.addToCart({ id: 2, name: "Keyboard", price: 100, quantity: 1, category: Category.Electronics })); // "Keyboard added to cart."
 console.log(cart.updateQuantity(1, 3)); // "Updated quantity of Headphones to 3."
-console.log(cart.getProductsOfCategory("Electronics")) // Should return all electronics
+console.log(cart.getProductsOfCategory(Category.Electronics)) // Should return all electronics
 console.log(cart.getTotalPrice()); // Should return the total cost of items
 console.log(cart.removeFromCart(2)); // "Keyboard removed from cart."
